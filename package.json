@@ -1,0 +1,16 @@
+{
+  "name": "stonks-bot",
+  "version": "1.0.0",
+  "description": "crypto trading bot",
+  "main": "index.js",
+  "scripts": {
+    "test": "test"
+  },
+  "author": "jw",
+  "license": "ISC",
+  "dependencies": {
+    "axios": "^0.21.1",
+    "ccxt": "^1.41.92",
+    "dotenv": "^8.2.0"
+  }
+}
