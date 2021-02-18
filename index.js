@@ -13,6 +13,44 @@ const logToFile = function(d) { //
   log_stdout.write(util.format(d) + '\n');
 };
 
+let stonks
+
+const cryptos = ['tether','bitcoin', 'ethereum', 'cardano', 'binancecoin', 'litecoin', 'polkadot']
+const symbols = {
+  tether: 'USDT',
+  bitcoin: 'BTC',
+  ethereum: 'ETH',
+  cardano: 'ADA',
+  binancecoin: 'BNB',
+  litecoin: 'LTC',
+  polkadot: 'DOT'
+}
+const fetchPrices = async () => {
+  const cryptos = Object.keys(symbols)
+  return axios.get(`https://api.coingecko.com/api/v3/simple/price?ids=${cryptos.join(',')}&vs_currencies=usd`)
+    .then(res => res.data)
+    .catch(err=> console.log('Failed to fetch prices: ',chalk.red(err)))
+}
+
+const calculatePrices = async (cryptos) => {
+  const usdRatio = (coin) => coin.usd / cryptos.tether.usd
+  const limits = {}
+
+  Object.entries(cryptos).forEach(([key, value]) => {
+    const marketValue = usdRatio(value)
+    const sellLimit = marketValue * (1 + spread)
+    const buyLimit = marketValue * (1 - spread)
+
+    limits[key] = {
+      marketValue: marketValue,
+      sellLimit: sellLimit,
+      buyLimit: buyLimit
+    }
+  })
+  console.log(limits)
+  return limits
+}
+
 const tick = async (config, binanceClient) => {
   const { asset, base, spread, allocation } = config
   const market = `${asset}/${base}`
@@ -24,17 +62,35 @@ const tick = async (config, binanceClient) => {
     })
   })
 
+  const prices = fetchPrices().then(prices => calculatePrices(prices))
+  
+  let total
+  binanceClient.fetchBalance().then(balances => {
+    Object.entries(prices).forEach(([key, {marketValue, sellLimit, buyLimit}]) => {
+      const symbol = symbols[key]
+      const available = balances.free[symbol]
+      const base = balances.free[USDT]
+
+      const sellVolume = available * allocation
+      const buyVolume = (base * allocation) / marketPrice
+      await binanceClient.createLimitSellOrder(market, sellVolume, sellLimit).catch(err => console.log('SELL ORDER: ',chalk.red(err)))
+      await binanceClient.createLimitBuyOrder(market, buyVolume, buyLimit).catch(err => console.log('BUY ORDER: ',chalk.red(err)))
+    })
+  })
+  .catch(err=>console.log(err))
+
   const results = await Promise.all([
     axios.get('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd'),
     axios.get('https://api.coingecko.com/api/v3/simple/price?ids=tether&vs_currencies=usd')
   ]).catch(err=>console.log(err))
 
   const marketPrice = results[0].data.bitcoin.usd / results[1].data.tether.usd
-
   const sellPrice = marketPrice * (1 + spread)
   const buyPrice = marketPrice * (1 - spread)
 
   const balances = await binanceClient.fetchBalance()
+  const total = balances.BTC.total*marketPrice + balances.USDT.total
+  stonks = stonks ? stonks : total
   const assetBalance = balances.free[asset]
   const baseBalance = balances.free[base]
 
@@ -42,33 +98,22 @@ const tick = async (config, binanceClient) => {
   const buyVolume = (baseBalance * allocation) / marketPrice
   await binanceClient.createLimitSellOrder(market, sellVolume, sellPrice).catch(err => console.log('SELL ORDER: ',chalk.red(err)))
   await binanceClient.createLimitBuyOrder(market, buyVolume, buyPrice).catch(err => console.log('BUY ORDER: ',chalk.red(err)))
-  
+
+  const diff = total - stonks >= 0 ? chalk.green(total-stonks) : chalk.red(total-stonks)
   console.log(`
-    NEW TICK FOR ${chalk.blue(market)}
+    NEW TICK FOR ${chalk.blue(market+': '+marketPrice)}
+    Current ballance: ${total} => ${diff}
     Created limit sell order for ${chalk.yellow(sellVolume)} @ ${chalk.green(sellPrice)}
     Created limit buy order for ${chalk.yellow(buyVolume)} @ ${chalk.green(buyPrice)}
   `)
-
-  // Promise.all([
-  //   binanceClient.createLimitSellOrder(market, sellVolume, sellPrice),
-  //   binanceClient.createLimitBuyOrder(market, buyVolume, buyPrice)
-  // ])
-  // .then(res => {
-  //   console.log(`
-  //   NEW TICK FOR ${chalk.market}
-  //   Created limit sell order for ${chalk.yellow(sellVolume)} @ ${chalk.green(sellPrice)}
-  //   Created limit buy order for ${chalk.yellow(buyVolume)} @ ${chalk.green(buyPrice)}
-  // `)
-  // })
-  // .catch(err=> console.log(chalk.red(err)))  
 }
 
 const init = () => {
   const config = {
     asset: 'BTC',
     base: 'USDT',
-    allocation: 0.2,
-    spread: 0.005,
+    allocation: 1.0,
+    spread: 0.1, //smaller spread => shorter bet
     tickInterval: 3000
   }
 
