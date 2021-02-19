@@ -2,12 +2,13 @@ require('dotenv').config()
 const chalk = require('chalk')
 const ccxt = require('ccxt')
 const axios = require('axios')
+const { logToFile } = require('./utils/logger')
 
 const symbols = {
   tether: 'USDT',
   bitcoin: 'BTC',
   ethereum: 'ETH',
-  cardano: 'ADA',
+  //cardano: 'ADA',
   binancecoin: 'BNB',
   litecoin: 'LTC',
   polkadot: 'DOT'
@@ -48,6 +49,7 @@ const calculatePrices = async (cryptos) => {
 }
 
 const tick = async (config, binanceClient) => {
+ logToFile( await binanceClient.fetchMarkets())
   const { asset, base, spread, allocation } = config
   const prices = await fetchPrices().then(prices => calculatePrices(prices))
   const market = `${asset}/${base}`
@@ -85,7 +87,7 @@ const init = () => {
   const config = {
     asset: 'BTC',
     base: 'USDT',
-    allocation: 1.0,
+    allocation: 0.5,
     spread: 0.2, //smaller spread => shorter bet
     tickInterval: 3000
   }
