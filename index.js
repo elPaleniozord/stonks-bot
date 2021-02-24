@@ -9,9 +9,9 @@ const symbols = {
   bitcoin: 'BTC',
   ethereum: 'ETH',
   //cardano: 'ADA',
-  binancecoin: 'BNB',
-  litecoin: 'LTC',
-  polkadot: 'DOT'
+  //binancecoin: 'BNB',
+  //litecoin: 'LTC',
+  //polkadot: 'DOT'
 }
 const fetchPrices = async () => {
   const cryptos = Object.keys(symbols)
@@ -21,12 +21,14 @@ const fetchPrices = async () => {
 }
 
 const cancelOpenOrders = async (client) => {
-  Promise.all([Object.values(symbols).forEach(coin => {
+  Object.values(symbols).forEach(coin => {
     if(coin === 'USDT') return
-    const market = coin+'/USDT'
-    return client.fetchOpenOrders(market)
-      .then(orders => orders.forEach(order => client.cancelOrder(order.id,order.symbol)))
-  })]).catch(err => console.log('FAILED TO CANCEL ORDER'))
+      return client.fetchOpenOrders(coin+'/USDT').then(orders=> {
+        orders.forEach(order => {
+          return client.cancelOrder(order.id, order.symbol)
+        })
+      })
+  })
 }
 
 const calculatePrices = async (cryptos) => {
@@ -34,7 +36,7 @@ const calculatePrices = async (cryptos) => {
   const limits = {}
 
   Object.entries(cryptos).forEach(([key, value]) => {
-    const spread = 0.1
+    const spread = 0.03
     const marketValue = usdRatio(value)
     const sellLimit = marketValue * (1 + spread)
     const buyLimit = marketValue * (1 - spread)
@@ -49,7 +51,6 @@ const calculatePrices = async (cryptos) => {
 }
 
 const tick = async (config, binanceClient) => {
- logToFile( await binanceClient.fetchMarkets())
   const { asset, base, spread, allocation } = config
   const prices = await fetchPrices().then(prices => calculatePrices(prices))
   const market = `${asset}/${base}`
@@ -87,8 +88,8 @@ const init = () => {
   const config = {
     asset: 'BTC',
     base: 'USDT',
-    allocation: 0.5,
-    spread: 0.2, //smaller spread => shorter bet
+    allocation: 0.2,
+    spread: 0.01, //smaller spread => shorter bet
     tickInterval: 3000
   }
 
