@@ -3,6 +3,8 @@ const chalk = require('chalk')
 const ccxt = require('ccxt')
 const axios = require('axios')
 const { logToFile } = require('./utils/logger')
+const { SocketClient } = require('./modules/socket')
+const { fetchChartData } = require('./modules/chart-data')
 
 const symbols = {
   tether: 'USDT',
@@ -98,8 +100,11 @@ const init = () => {
     secret: process.env.API_SECRET
   })
 
-  tick(config, binanceClient)
-  setInterval(tick, config.tickInterval, config, binanceClient)
+  //tick(config, binanceClient)
+  //setInterval(tick, config.tickInterval, config, binanceClient)
+
+  //const socketClient = new SocketClient('ws/btcusdt@kline_15m')
+  fetchChartData('btcusdt', '15m')
 }
 
 init()
