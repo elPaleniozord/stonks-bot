@@ -11,14 +11,35 @@
 const { default: axios } = require("axios")
 const { logToFile } = require('../utils/logger')
 
-const fetchChartData = async (symbol, interval, start = Date.now() - (24*60*60*1000)  ,end = Date.now(), limit) => {
+const fetchChartData = async (symbol, interval, start , end, limit) => {
+  console.log('fetch candles')
   const baseUrl = 'https://api.binance.com/api/v3/klines'
-  
-  return axios.get(`${baseUrl}?symbol=${symbol.toUpperCase()}&interval=${interval}&startTime=${start}&endTime=${end}${limit ? `&limit=${limit}` : ''}`)
-  .then(res => res.data)
-  .catch(err => {
-    console.log(err)
-  })
+  const uri = `${baseUrl}
+        ?symbol=${symbol.toUpperCase()}
+        &interval=${interval}
+        ${start ? `&startTime=${start}` : ''}
+        ${end ? `&endTime=${end}` : ''}
+        ${limit ? `&limit=${limit}` : ''}`
+        
+  return axios.get(uri.replace(/\s/g, ''))
+    .then(res => {
+      return res.data.map(([openTimestamp, open, high, low, close, volume, closeTimestamp, quote, numberOfTrades, takerBuyBaseAssetVol, takerBuyQuoteAssetVol, ]) => {
+        return {
+          oT: openTimestamp,
+          cT: closeTimestamp,
+          o: +open,
+          c: +close,
+          h: +high,
+          l: +low,
+          v: +volume,
+          q: +quote
+        }
+      })
+      
+    })
+    .catch(err => {
+      console.log(err)
+    })
 }
 
 exports.fetchChartData = fetchChartData

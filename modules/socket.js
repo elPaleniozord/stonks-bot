@@ -3,7 +3,7 @@ const WebSocket = require('ws')
 //wss://stream.binance.com:9443/ws/btcusdt@kline_15m
 class SocketClient {
   constructor(path, baseUrl) {
-    this.baseUrl = baseUrl || 'wss://stream.binance.com:9443'
+    this.baseUrl = baseUrl || 'wss://stream.binance.com:9443/'
     this._path = path
     this._createSocket()
     this._handlers = new Map()
@@ -26,7 +26,8 @@ class SocketClient {
     }
 
     this._ws.onmessage = (msg) => {
-      console.log(msg)
+      const data = JSON.parse(msg.data)
+      console.log(data)
     }
   }
 }

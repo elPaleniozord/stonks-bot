@@ -5,6 +5,8 @@ const axios = require('axios')
 const { logToFile } = require('./utils/logger')
 const { SocketClient } = require('./modules/socket')
 const { fetchChartData } = require('./modules/chart-data')
+const { rsi } = require('./indicators/rsi')
+const { sma, wma, ema } = require('./indicators/ma')
 
 const symbols = {
   tether: 'USDT',
@@ -50,6 +52,20 @@ const calculatePrices = async (cryptos) => {
     }
   })
   return limits
+}
+
+const processGraph = async ({symbol, interval, limit}, binanceClient) => {
+  //const data = await binanceClient.fetchOHLCV(symbol, interval, limit)
+  const data = await fetchChartData('btcusdt', '1h')
+  console.log('RSI: ', rsi(data))
+  //console.log('MACD: ', rsi(data))
+  console.log('SMA-5: ', sma(data, 5))
+  console.log('SMA-8: ', sma(data, 8))
+  console.log('SMA-13: ', sma(data, 13))
+  console.log('WMA-7: ', wma(data, 7))
+  console.log('EMA-7: ', ema(data, 7))
+  //const [openTimestamp, open, high, low, close, volume, closeTime, quote, takerBuyBaseAssetVol, takerBuyQuoteAssetVol] = data[0]
+  
 }
 
 const tick = async (config, binanceClient) => {
@@ -104,7 +120,14 @@ const init = () => {
   //setInterval(tick, config.tickInterval, config, binanceClient)
 
   //const socketClient = new SocketClient('ws/btcusdt@kline_15m')
-  fetchChartData('btcusdt', '15m')
+  const kline = {
+    symbol: 'BTC/USDT',
+    interval: '15m'
+  }
+  processGraph(kline, binanceClient)
+  //fetchChartData('btcusdt', '15m').then(res => logToFile(res))
+  // console.log('binance')
+  //binanceClient.fetchOHLCV('BTC/USDT', '15m').then(res => logToFile(res))
 }
 
 init()
