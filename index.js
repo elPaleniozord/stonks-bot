@@ -6,7 +6,8 @@ const { logToFile } = require('./utils/logger')
 const { SocketClient } = require('./modules/socket')
 const { fetchChartData } = require('./modules/chart-data')
 const { rsi } = require('./indicators/rsi')
-const { sma, wma, ema } = require('./indicators/ma')
+const { sma, wma, ema, ema2 } = require('./indicators/ma')
+const { macd } = require('./indicators/macd')
 
 const symbols = {
   tether: 'USDT',
@@ -56,15 +57,21 @@ const calculatePrices = async (cryptos) => {
 
 const processGraph = async ({symbol, interval, limit}, binanceClient) => {
   //const data = await binanceClient.fetchOHLCV(symbol, interval, limit)
-  const data = await fetchChartData('btcusdt', '1h')
-  console.log('RSI: ', rsi(data))
-  //console.log('MACD: ', rsi(data))
-  console.log('SMA-5: ', sma(data, 5))
-  console.log('SMA-8: ', sma(data, 8))
-  console.log('SMA-13: ', sma(data, 13))
-  console.log('WMA-7: ', wma(data, 7))
+  const data = await fetchChartData('btcusdt', '15m')
+//   // console.log('RSI: ', rsi(data))
+//   console.log('SMA-7: ', sma(data, 7))
+//   console.log('SMA-25: ', sma(data, 25))
+//   console.log('SMA-99: ', sma(data, 99))
+//  // console.log('WMA-7: ', wma(data, 7))
+//   //console.log('WMA-25: ', wma(data, 25))
+//   //console.log('WMA-99: ', wma(data, 99))
   console.log('EMA-7: ', ema(data, 7))
-  //const [openTimestamp, open, high, low, close, volume, closeTime, quote, takerBuyBaseAssetVol, takerBuyQuoteAssetVol] = data[0]
+  // console.log('EMA-25: ', ema(data, 25))
+  // console.log('EMA-99: ', ema(data, 99))
+  console.log('EMA-7: ', ema2(data, 7))
+  // console.log('EMA-25: ', ema2(data, 25))
+  //console.log('EMA-99: ', ema2(data, 99))
+  //console.log('MACD: ', macd(data, {fast: 5, slow: 21, l: 5}))
   
 }
 
@@ -125,7 +132,7 @@ const init = () => {
     interval: '15m'
   }
   processGraph(kline, binanceClient)
-  //fetchChartData('btcusdt', '15m').then(res => logToFile(res))
+  //fetchChartData('btcusdt', '1h', 1614639600000, 1614726000000 ).then(res => logToFile(JSON.stringify(res)))
   // console.log('binance')
   //binanceClient.fetchOHLCV('BTC/USDT', '15m').then(res => logToFile(res))
 }

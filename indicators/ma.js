@@ -1,4 +1,4 @@
-const simpleMA = (data, period=7, previous) => {
+const SMA = (data, period=7, previous) => {
   const n = data.slice(data.length - period)
   let sma = 0
   for(let i=0; i<n.length; i++) {
@@ -8,8 +8,8 @@ const simpleMA = (data, period=7, previous) => {
 }
 
 
-const weightedMA = (data, period) => {
-  const n = data.slice(data.length - period).reverse() //reversed due to recent prices having higher weigth
+const WMA = (data, period) => {
+  const n = data.slice(data.length - period)
   let wma = 0
   for(let i=0; i<n.length; i++) {
     wma += n[i].c * (period-i)
@@ -17,17 +17,33 @@ const weightedMA = (data, period) => {
   return wma / ((period * (period+1)) / 2)
 }
 
-const expMA = (data, period) => {
-  const n = data.slice(data.length - period).reverse() //reversed due to recent prices having higher weigth
-  const exp = 2/(period+1)
-  let ema = n[0].c
-  
-  for(let i=1; i<n.length; i++) {
-    ema = ema * exp + n[i].c * (1 - exp)
+const EMA = (data, period = 12) => {
+  var pl = [], ema = [], prevema = 0,
+  weight = 2 / (period + 1);
+  for(var i = 0; i < data.length; i++) {
+    pl.push(data[i].c);
+    var average = 0;
+    if(prevema == 0 && pl.length >= period) {
+      for(q in pl) average += pl[q];
+      average /= period;
+      ema.push(average);
+      prevema = average;
+    } else if(prevema != 0 && pl.length >= period) {
+      average = (data[i].c - prevema) * weight + prevema;
+      ema.push(average);
+      prevema = average;
+    }
   }
-  return ema
+  return ema[ema.length-2];
 }
 
-exports.sma = simpleMA
-exports.wma = weightedMA
-exports.ema = expMA
+function ema2(data, period, weight) {
+  const k = weight ? weight : 2/(period+1)
+
+  return period>1 ? (data[data.length - period].c * k) + (ema2(data, period-1, k) * (1-k)) : data[data.length - period].c
+}
+
+exports.sma = SMA
+exports.wma = WMA
+exports.ema = EMA
+exports.ema2 = ema2

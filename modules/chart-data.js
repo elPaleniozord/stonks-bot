@@ -20,6 +20,7 @@ const fetchChartData = async (symbol, interval, start , end, limit) => {
         ${start ? `&startTime=${start}` : ''}
         ${end ? `&endTime=${end}` : ''}
         ${limit ? `&limit=${limit}` : ''}`
+  console.log(uri)
         
   return axios.get(uri.replace(/\s/g, ''))
     .then(res => {
