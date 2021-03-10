@@ -1,20 +1,29 @@
-const SMA = (data, period=7, previous) => {
-  const n = data.slice(data.length - period)
-  let sma = 0
-  for(let i=0; i<n.length; i++) {
-    sma += n[i].c
+const SMA = (data, period=7) => {
+  let sma = [], sum = 0
+  for(let i=0; i<data.length; i++) {
+    sum += data[i].c
+    if(i >= period-1) {
+      sma.push(sum/period)
+      sum -= data[i-(period-1)].c
+    }
   }
-  return sma/period
+  return sma
 }
 
-
-const WMA = (data, period) => {
-  const n = data.slice(data.length - period)
-  let wma = 0
-  for(let i=0; i<n.length; i++) {
-    wma += n[i].c * (period-i)
+const WMA = (data, period = 14) => {
+  let wma = [], weight = (period*(period+1))/2, movingWindow = []
+  for(let i=0; i<data.length; i++) {
+    movingWindow.push(data[i].c)
+    if(i >= period - 1) {
+      let avg = 0
+      movingWindow.forEach((price, i) => {
+        avg += price * (i+1) / weight
+      })
+      wma.push(avg)
+      movingWindow.splice(0, 1)
+    }
   }
-  return wma / ((period * (period+1)) / 2)
+  return wma
 }
 
 const EMA = (data, period = 12) => {
@@ -34,16 +43,9 @@ const EMA = (data, period = 12) => {
       prevema = average;
     }
   }
-  return ema[ema.length-2];
+  return ema;
 }
 
-function ema2(data, period, weight) {
-  const k = weight ? weight : 2/(period+1)
-
-  return period>1 ? (data[data.length - period].c * k) + (ema2(data, period-1, k) * (1-k)) : data[data.length - period].c
-}
-
-exports.sma = SMA
-exports.wma = WMA
-exports.ema = EMA
-exports.ema2 = ema2
+exports.SMA = SMA
+exports.WMA = WMA
+exports.EMA = EMA

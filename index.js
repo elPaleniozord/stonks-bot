@@ -8,6 +8,7 @@ const { fetchChartData } = require('./modules/chart-data')
 const { rsi } = require('./indicators/rsi')
 const { sma, wma, ema, ema2 } = require('./indicators/ma')
 const { macd } = require('./indicators/macd')
+const { stoch } = require('./indicators/stochastic')
 
 const symbols = {
   tether: 'USDT',
@@ -58,20 +59,21 @@ const calculatePrices = async (cryptos) => {
 const processGraph = async ({symbol, interval, limit}, binanceClient) => {
   //const data = await binanceClient.fetchOHLCV(symbol, interval, limit)
   const data = await fetchChartData('btcusdt', '15m')
-//   // console.log('RSI: ', rsi(data))
+  console.log('RSI: ', rsi(data))
 //   console.log('SMA-7: ', sma(data, 7))
 //   console.log('SMA-25: ', sma(data, 25))
 //   console.log('SMA-99: ', sma(data, 99))
 //  // console.log('WMA-7: ', wma(data, 7))
 //   //console.log('WMA-25: ', wma(data, 25))
 //   //console.log('WMA-99: ', wma(data, 99))
-  console.log('EMA-7: ', ema(data, 7))
+  //console.log('EMA-7: ', ema(data.slice(data.length - 7), 7))
   // console.log('EMA-25: ', ema(data, 25))
   // console.log('EMA-99: ', ema(data, 99))
-  console.log('EMA-7: ', ema2(data, 7))
+  //console.log('EMA-7: ', ema2(data, 7))
   // console.log('EMA-25: ', ema2(data, 25))
   //console.log('EMA-99: ', ema2(data, 99))
-  //console.log('MACD: ', macd(data, {fast: 5, slow: 21, l: 5}))
+  console.log('MACD: ', macd(data, 5, 21, 8))
+  console.log('stochastic: ', stoch(data))
   
 }
 
