@@ -1,5 +1,4 @@
 const {EMA, WMA, SMA} = require('../indicators/ma')
-const {MACD} = require('../indicators/macd')
 const data = require('./data/sample')
 
 const prices = data.close.map(d => ({c: d}))
@@ -61,19 +60,3 @@ test('Should properly compute 9 period SMA for mock data', () => {
   const sma = SMA(prices, 9)
   expect(sma).toEqual(expectedResult)
 })
-
-// test('Should properly compute MACD ', () => {
-//   var expectedResult =  [
-//     139.438,
-//     142.908,
-//     147.901,
-//     154.661,
-//     162.31099999999998,
-//     171.736,
-//     182.33599999999998,
-//     196.24,
-//     210.362,
-//   ]
-//   const sma = MACD(prices, 10)
-//   expect(sma).toEqual(expectedResult)
-// })
