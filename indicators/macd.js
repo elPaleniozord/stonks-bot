@@ -11,7 +11,7 @@ const MACD = (ticks, fast=5, slow=21, l=8) => {
     }    
   }
   
-  const signal = EMA(macd.map(v => ({c: v})), l)  //set universal format for each price/indicator
+  const signal = EMA(macd, l)  //set universal format for each price/indicator
   const histogram = macd.splice(0, signal.length).map((v,i) => v - signal[i])
   return {
     macd,

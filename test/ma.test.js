@@ -1,7 +1,7 @@
 const {EMA, WMA, SMA} = require('../indicators/ma')
 const data = require('./data/sample')
 
-const prices = data.close.map(d => ({c: d}))
+const prices = data.close
 
 test('Should properly compute 9 period EMA for mock data', () => {
   const period = 9
