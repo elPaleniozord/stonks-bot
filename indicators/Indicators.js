@@ -1,12 +1,14 @@
 class Indicator {
   constructor(input) {
     this.results = []
-    this.id = `${input.symbol}-${input.interval}`
+    this.sentiment = 'Consolidation'
+    this.strength = 0
+    this.value = 0
   }
 
-  newTick(tick){
-    
+  update(tick) {
   }
+
   getResults() {
     return this.results
   }
