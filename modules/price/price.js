@@ -1,6 +1,6 @@
-class Price {
-  constructor(symbol) {
-    this.symbol = symbol
+module.exports = class Price {
+  constructor(symbol, interval) {
+    this.symbol = `${symbol}-${interval}`
     this.observers = []
     this.ticks = []
   }
@@ -27,5 +27,3 @@ class Price {
     this.notify(tick)
   }
 }
-
-exports.Price = Price

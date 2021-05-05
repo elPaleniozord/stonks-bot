@@ -1,9 +1,10 @@
-class Indicator {
+module.exports = class Indicator {
   constructor(input) {
     this.results = []
     this.sentiment = 'Consolidation'
     this.strength = 0
     this.value = 0
+    this.signal = {}
   }
 
   update(tick) {
@@ -12,6 +13,8 @@ class Indicator {
   getResults() {
     return this.results
   }
-}
 
-exports.Indicator = Indicator
+  getSignal() {
+    return this.signal
+  }
+}

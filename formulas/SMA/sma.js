@@ -26,15 +26,3 @@ class SimpleMovingAverage {
     return [this.sma, this.prices]
   }
 }
-const data = []
-const sma = new SimpleMovingAverage(4, data)
-
-console.log('should return undefined', sma.value())
-sma.update(3)
-data.push(1)
-sma.update(4)
-data.push(2)
-console.log('should return 2.5', sma.value())
-sma.update(5)
-data.push(3)
-console.log('should return 3.5', sma.value())

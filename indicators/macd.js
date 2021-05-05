@@ -1,4 +1,3 @@
-const { Indicator } = require('./Indicators')
 const { EMA } = require('./ma')
 
 const MACD = (ticks, fast=5, slow=21, l=8) => {

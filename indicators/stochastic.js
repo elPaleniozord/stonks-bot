@@ -1,17 +1,41 @@
-const { Indicator } = require('./Indicators')
+const { Indicator } = require('./Indicator')
 
-export class Stochastic extends Indicator {
-  constructor(period, smoothK, smoothD) {
+class Stochastic extends Indicator {
+  constructor(period = 14, smoothK = 3, smoothD = 3) {
     super(props)
     this.id = 'stoch'
     this.period = period
     this.sk = smoothK
     this.sd = smoothD
+    this.prices = []
   }
-  update(tick) {
-    const [openTime, closeTime, open, high, low, close, vol, q] = tick
-    const spread = (c-l) / (h-l)
+  update([openT, closeT, open, close, high, low, v] = tick) {
+    /*
+    Base stochastic is calculated as: %K = (C - L / H - L) * 100
+    where: 
+    C - current price
+    L - lowest price in given period
+    H - highest price in given period
+    */
+    if(this.prices.length >= this.period) {
+      this.prices.shift()
+    }
     
+    const [min, max] = prices.reduce((acc, val) => {
+      acc[0] = (acc[0] === undefined || val < acc[0]) ? val : acc[0]
+      acc[1] = (acc[1] === undefined || val > acc[1]) ? val : acc[0] 
+    })
+
+    this.prices.push(close)
+
+    const slow = (close - min) / (max - min) * 100
+
+    //fast moving indicator is calculated from highest and lowest price of given smoothing period
+    const [l, h] = this.minMax(this.prices.splice(this.prices.length - 1 - this.sd, this.sd))
+    
+    const fast = 100 * (h / l)
+    
+    this.results.push([slow, fast])
   }
 
   signal(){
@@ -24,6 +48,13 @@ export class Stochastic extends Indicator {
       sentiment: sentiment,
       strength: Math.abs(.5 - this.sk)
     }
+  }
+
+  minMax(arr) {
+    return arr.reduce((acc, val) => {
+      acc[0] = (acc[0] === undefined || val < acc[0]) ? val : acc[0]
+      acc[1] = (acc[1] === undefined || val > acc[1]) ? val : acc[0] 
+    })
   }
 }
 
