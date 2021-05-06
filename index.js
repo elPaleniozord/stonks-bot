@@ -116,7 +116,7 @@ const init = () => {
     asset: 'BTC',
     base: 'USDT',
     allocation: 0.2,
-    spread: 0.01, //smaller spread => shorter bet
+    spread: 0.01,
     tickInterval: 3000
   }
 

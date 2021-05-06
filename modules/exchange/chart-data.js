@@ -9,7 +9,7 @@
 //Data format = [openTimestamp, open, high, low, close, volume, closeTimestamp, quote, numberOfTrades, takerBuyBaseAssetVol, takerBuyQuoteAssetVol, ignore]
 
 const { default: axios } = require("axios")
-const { logToFile } = require('../utils/logger')
+const { logToFile } = require('../../utils/logger')
 
 const fetchChartData = async (symbol, interval, start , end, limit) => {
   console.log('fetch candles')

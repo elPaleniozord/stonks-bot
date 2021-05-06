@@ -4,7 +4,9 @@
   "description": "crypto trading bot",
   "main": "index.js",
   "scripts": {
-    "test": "jest"
+    "test": "jest",
+    "test-session": "npm run test-session",
+    "init": "npm run CryptoBot"
   },
   "author": "jw",
   "license": "ISC",

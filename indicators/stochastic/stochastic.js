@@ -1,4 +1,4 @@
-const { Indicator } = require('./Indicator')
+const { Indicator } = require('../Indicator')
 
 class Stochastic extends Indicator {
   constructor(period = 14, smoothK = 3, smoothD = 3) {
@@ -11,11 +11,11 @@ class Stochastic extends Indicator {
   }
   update([openT, closeT, open, close, high, low, v] = tick) {
     /*
-    Base stochastic is calculated as: %K = (C - L / H - L) * 100
-    where: 
-    C - current price
-    L - lowest price in given period
-    H - highest price in given period
+      Base stochastic is calculated as: %K = (C - L / H - L) * 100
+      where: 
+      C - current price
+      L - lowest price in given period
+      H - highest price in given period
     */
     if(this.prices.length >= this.period) {
       this.prices.shift()
@@ -58,7 +58,7 @@ class Stochastic extends Indicator {
   }
 }
 
-const { SMA } = require("./ma")
+const { SMA } = require("../ma")
 
 const STOCH = (data, period = 14, sd = 3, sk = 3) => {
   const spread = data.map(d => (d.c - d.l)/(d.h - d.l))
